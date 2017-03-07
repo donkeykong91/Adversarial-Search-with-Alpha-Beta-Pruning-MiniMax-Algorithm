@@ -4,19 +4,17 @@ import java.util.Scanner;
 
 public class AdverserialSearch {
 	static final int DIMENSION = 8, MAX = 30;
-	static int[] board = new int[DIMENSION];
-	static int[] newBoard = new int[DIMENSION];
-	static String[][] edgeLabels = 
+	static String[][] board = 
 		{
-				{"  1", " 2", " 3", " 4", " 5", " 6", " 7", " 8"},
-				{"A ", "-", " -", " -", " -", " -", " -", " -", " -"},
-				{"B ", "-", " -", " -", " -", " -", " -", " -", " -"},
-				{"C ", "-", " -", " -", " -", " -", " -", " -", " -"},
-				{"D ", "-", " -", " -", " -", " -", " -", " -", " -"},
-				{"E ", "-", " -", " -", " -", " -", " -", " -", " -"},
-				{"F ", "-", " -", " -", " -", " -", " -", " -", " -"},
-				{"G ", "-", " -", " -", " -", " -", " -", " -", " -"},
-				{"H ", "-", " -", " -", " -", " -", " -", " -", " -"},
+				{" ", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8"},
+				{"A", " -", " -", " -", " -", " -", " -", " -", " -"},
+				{"B", " -", " -", " -", " -", " -", " -", " -", " -"},
+				{"C", " -", " -", " -", " -", " -", " -", " -", " -"},
+				{"D", " -", " -", " -", " -", " -", " -", " -", " -"},
+				{"E", " -", " -", " -", " -", " -", " -", " -", " -"},
+				{"F", " -", " -", " -", " -", " -", " -", " -", " -"},
+				{"G", " -", " -", " -", " -", " -", " -", " -", " -"},
+				{"H", " -", " -", " -", " -", " -", " -", " -", " -"},
 		};	
 	
 	public static void main(String[] args) {
@@ -33,17 +31,17 @@ public class AdverserialSearch {
 	    				String answer = cin.next();
 		    			if (answer.equals("y")) {
 		    				System.out.println();
-		    				printBoard(edgeLabels);
+		    				printBoard(board);
 		    		    	System.out.print("\nMy current move is: ");
 		    		    	String move = cin.next();
-		    		    	
+		    		    	markMoveOnBoard(move);
 		    				break;
 		    			}else if (answer.equals("n")) {
 		    				System.out.println();
-		    				printBoard(edgeLabels);
+		    				printBoard(board);
 		    		    	System.out.print("\nMy current move is: ");
 		    		    	String move = cin.next();
-		    		    	
+		    		    	miniMaxAlgorithm();
 		    		    	break;
 		    			}else{System.out.print("\nPlease enter either \"y\" or \"n\": ");}
 
@@ -76,13 +74,32 @@ public class AdverserialSearch {
 		}
 	}
 	
-	public static void printBoard(String[][] edgeLabels) {
-		for (int row = 0; row < edgeLabels.length; row++) {
-			for (int col = 0; col < edgeLabels[row].length; col++) {
-				System.out.print(edgeLabels[row][col]);
+	public static void printBoard(String[][] board) {
+		for (int row = 0; row < board.length; row++) {
+			for (int col = 0; col < board[row].length; col++) {
+				System.out.print(board[row][col]);
 			}
 			System.out.println();
 		}
+	}
+	
+	public static void miniMaxAlgorithm() {
+		// TODO Auto-generated method stub
+
+	}
+	
+	public static void markMoveOnBoard(String move) {
+		String letter = String.valueOf(move.charAt(0));
+		String number = String.valueOf(move.charAt(1));
+		
+		addToBoard(letter, number);
+	}
+	
+	public static void addToBoard(String letter, String number) {
+		int i1 = letter.charAt(0) - 'a' + 1;
+		int i2 = Integer.parseInt(number);
+		board[i1][i2] = board[i1][i2].replace("-", "X");
+		printBoard(board);
 	}
 }
 
