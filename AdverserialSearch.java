@@ -1,6 +1,6 @@
 package com.cs499.project3;
 
-import java.util.Scanner;
+import java.util.*;
 
 public class AdverserialSearch {
 	static final int DIMENSION = 8, MAX = 30;
@@ -35,13 +35,13 @@ public class AdverserialSearch {
 		    		    	System.out.print("\nMy current move is: ");
 		    		    	String move = cin.next();
 		    		    	markMoveOnBoard(move);
+		    		    	miniMaxAlgorithm(move);
 		    				break;
 		    			}else if (answer.equals("n")) {
 		    				System.out.println();
 		    				printBoard(board);
-		    		    	System.out.print("\nMy current move is: ");
-		    		    	String move = cin.next();
-		    		    	miniMaxAlgorithm();
+		    		    	System.out.print("\nMy current move is: " + markRandMoveOnBoard());
+//		    		    	miniMaxAlgorithm(move);
 		    		    	break;
 		    			}else{System.out.print("\nPlease enter either \"y\" or \"n\": ");}
 
@@ -83,7 +83,7 @@ public class AdverserialSearch {
 		}
 	}
 	
-	public static void miniMaxAlgorithm() {
+	public static void miniMaxAlgorithm(String move) {
 		// TODO Auto-generated method stub
 
 	}
@@ -93,6 +93,15 @@ public class AdverserialSearch {
 		String number = String.valueOf(move.charAt(1));
 		
 		addToBoard(letter, number);
+	}
+	
+	public static String markRandMoveOnBoard() {
+		int low = 97, high = 104;
+		String letter = String.valueOf((char) (new Random().nextInt(high-low+1) + low)), 
+			   number = String.valueOf(new Random().nextInt(7)+1);
+		
+		addToBoard(letter, number);
+		return letter+number;
 	}
 	
 	public static void addToBoard(String letter, String number) {
