@@ -3,7 +3,8 @@ package com.cs499.project3;
 import java.util.*;
 
 public class AdverserialSearch {
-	static final int DIMENSION = 8, MAX = 30;
+	static final int DIMENSION = 9, MAX = 30;
+	static String player;
 	static String[][] board = 
 		{
 				{" ", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8"},
@@ -30,6 +31,7 @@ public class AdverserialSearch {
 	    			while (true) {
 	    				String answer = cin.next();
 		    			if (answer.equals("y")) {
+		    				player = "opponent";
 		    				System.out.println();
 		    				printBoard(board);
 		    		    	System.out.print("\nMy current move is: ");
@@ -38,6 +40,7 @@ public class AdverserialSearch {
 		    		    	miniMaxAlgorithm(move);
 		    				break;
 		    			}else if (answer.equals("n")) {
+		    				player = "computer";
 		    				System.out.println();
 		    				printBoard(board);
 		    		    	System.out.print("\nMy current move is: " + markRandMoveOnBoard());
@@ -51,27 +54,6 @@ public class AdverserialSearch {
 	    	}
 	    }
 		System.out.println();
-	}
-
-	public static void printBoard(int[] board) {
-		String[][] board2D = new String[DIMENSION][DIMENSION];
-		
-		for (int row = 0; row < board2D.length; row++) {
-			for (int col = 0; col < board2D[row].length; col++) {
-				board2D[row][col] = "- ";
-			}
-		}
-		
-		for (int col = 0; col < board2D.length; col++) {
-			board2D[board[col]][col] = "Q ";
-		}
-		
-		for(int row = 0; row < board2D.length; row++) {
-			for (int col = 0; col < board2D[row].length; col++) {
-				System.out.print(board2D[row][col]);
-			}
-			System.out.println();
-		}
 	}
 	
 	public static void printBoard(String[][] board) {
@@ -92,29 +74,55 @@ public class AdverserialSearch {
 		String letter = String.valueOf(move.charAt(0));
 		String number = String.valueOf(move.charAt(1));
 		
-		addToBoard(letter, number);
+		addToBoardForPerson(letter, number);
 	}
 	
 	public static String markRandMoveOnBoard() {
 		int low = 97, high = 104;
 		String letter = String.valueOf((char) (new Random().nextInt(high-low+1) + low)), 
 			   number = String.valueOf(new Random().nextInt(7)+1);
-		
-		addToBoard(letter, number);
+		addToBoardForComp(letter, number);
 		return letter+number;
 	}
 	
-	public static void addToBoard(String letter, String number) {
+	public static void addToBoardForComp(String letter, String number) {
 		int i1 = letter.charAt(0) - 'a' + 1;
 		int i2 = Integer.parseInt(number);
 		board[i1][i2] = board[i1][i2].replace("-", "X");
 		printBoard(board);
 	}
+	
+	public static void addToBoardForPerson(String letter, String number) {
+		int i1 = letter.charAt(0) - 'a' + 1;
+		int i2 = Integer.parseInt(number);
+		board[i1][i2] = board[i1][i2].replace("-", "O");
+		printBoard(board);
+	}
 }
 
+class Node {
+	private int value;
+	String [][] newCurrentBoard = new String[9][9];
+	Queue<Node> successorStates = new PriorityQueue<>();
+	
+	Node(){}
+	
+	Node (String[][] currentBoard) {
+		System.arraycopy(currentBoard, 0, newCurrentBoard, 0, currentBoard.length);
+	}
+	
+	public void setValue(int value) {this.value = value;}
+	
+	public int getValue() {return value;}
+}
 
-
-
+class SuccessorComparator implements Comparator<Node> {
+	public int compare (Node firstSuccessor, Node secondSuccessor) {
+		if (firstSuccessor.getValue() > secondSuccessor.getValue()) return -1;
+		else if (secondSuccessor.getValue() > firstSuccessor.getValue()) return 1;
+		return 0;
+	}
+}
 
 
 
