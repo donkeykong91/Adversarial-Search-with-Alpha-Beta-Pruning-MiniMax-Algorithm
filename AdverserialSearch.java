@@ -3,15 +3,13 @@ package com.cs499.project3;
 import java.util.*;
 
 public class AdverserialSearch {
-	static final int DIMENSION = 9, MAX = 30;
-	static String opponent = " O";
-;
+	static final int DIMENSION = 8, MAX = 30, DEPTH = 64;;
 	static String[][] board = 
 		{
 				{" ", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8"},
 				{"A", " X", " X", " X", " -", " -", " -", " -", " -"},
-				{"B", " -", " -", " -", " -", " -", " -", " -", " -"},
-				{"C", " O", " O", " O", " -", " -", " -", " -", " -"},
+				{"B", " O", " O", " -", " -", " -", " -", " -", " -"},
+				{"C", " -", " -", " -", " -", " -", " -", " -", " -"},
 				{"D", " -", " -", " -", " -", " -", " -", " -", " -"},
 				{"E", " -", " -", " -", " -", " -", " -", " -", " -"},
 				{"F", " -", " -", " -", " -", " -", " -", " -", " -"},
@@ -30,7 +28,6 @@ public class AdverserialSearch {
 	    		if (timeLimit <= MAX){
 	    			System.out.print("\nWould you like to go first?(y or n): ");
 	    			while (true) {
-	    				Node state = new Node();
 	    				String answer = cin.next(), move;
 		    			if (answer.equals("y")) {
 		    				while (true) {
@@ -39,25 +36,33 @@ public class AdverserialSearch {
 			    		    	System.out.print("\nMy current move is: ");
 			    		    	move = cin.next();
 			    		    	markOponentMoveOnBoard(move);
-			    		    	if (isWinner(opponent, move)) break;
-	//		    		    	miniMaxAlgorithm(state);
-//			    		    	System.out.print("\nChoose your next move: " + state.printMove());
-			    		    	if (isWinner(state.getPlayer(), state.getPlayer())) break;
+			    		    	if (isGameOver()) {
+			    		    		System.out.println("\nOpponent wins");
+			    		    		break;
+			    		    	}
+			    		    	miniMaxAlgorithm();
+			    		    	if (isGameOver()) {
+			    		    		System.out.println("\nComputer wins");
+			    		    		break;
+			    		    	}
 		    				}
-		    				System.out.println("\nOpponent wins");
 		    				break;
 		    			}else if (answer.equals("n")) {
 		    				while (true) {
 		    					System.out.println();
 			    				printBoard(board);
-   	//		    		    	miniMaxAlgorithm(state);
-//			    		    	System.out.print("\nMy current move is: " + state.printMove());
-			    		    	if (isWinner(state.getPlayer(), state.getPlayer())) break;
+   			    		    	miniMaxAlgorithm();
+			    		    	if (isGameOver()) {
+			    		    		System.out.println("\nComputer wins");
+			    		    		break;
+			    		    	}
 			    		    	System.out.println("\nChoose your next move: ");
 			    		    	move = cin.next();
 			    		    	markOponentMoveOnBoard(move);
-			    		    	if (isWinner(state.getPlayer(), move)) break;
-//			    				state.setBoard(board);
+			    		    	if (isGameOver()) {
+			    		    		System.out.println("\nOpponent wins");
+			    		    		break;
+			    		    	}
 		    				}
 		    		    	break;
 		    			}else{System.out.print("\nPlease enter either \"y\" or \"n\": ");}
@@ -68,6 +73,7 @@ public class AdverserialSearch {
 	    }
 		System.out.println();
 	}
+
 	
 	public static void printBoard(String[][] board) {
 		for (int row = 0; row < board.length; row++) {
@@ -78,44 +84,126 @@ public class AdverserialSearch {
 		}
 	}
 	
-	public static void miniMaxAlgorithm(Node state) {
-		state = minValue();
+	public static void miniMaxAlgorithm() {
+		int depth = DEPTH, currentValue = 0, bestValue = Integer.MIN_VALUE, 
+				    newRow = 0, newCol = 0;
+		String player = " X";
+		
+		if (isBoardEmpty()) markRandMoveOnBoard();
+		else {
+			for (int row = 1; row < board.length; row++) {
+				for (int col = 1; col < board.length; col++) {
+					if (board[row][col].equals(" -")) {
+						board[row][col] = player;
+						currentValue = minValue(depth-1);
+						if (currentValue > bestValue) {
+							newRow = row;
+							newCol = col;
+							bestValue = currentValue;
+						}
+						board[row][col] = " -";
+					}
+				}
+			}
+			System.out.println("\nMy current move is: " + newRow + newCol);
+			board[newRow][newCol] = player;
+			printBoard(board);
+		}		
 	}
 	
-	public static Node minValue() {
-		return null;
+	public static int minValue(int depth) {
+		int bestValue = Integer.MAX_VALUE, currentValue = 0;
+		String player = " O";
+		if (isWinner() != 0) return isWinner();
+		if (depth == 0) return 0;
+		
+		for (int row = 1; row < board.length; row++) {
+			for (int col = 1; col < board.length; col++) {
+				if (board[row][col].equals(" -")) {
+					board[row][col] = player;
+					currentValue = maxValue(depth-1);
+					if (currentValue < bestValue) bestValue = currentValue;
+					board[row][col] = " -";
+				}
+			}
+		}
+		return bestValue;
 	}
 	
-	public static Node maxValue() {
-		return null;
+	public static int maxValue(int depth) {
+		int bestValue = Integer.MIN_VALUE, currentValue = 0;
+		String player = " X";
+		if (isWinner() != 0) return isWinner();
+		if (depth == 0) return 0;
+		
+		for (int row = 1; row < board.length; row++) {
+			for (int col = 1; col < board.length; col++) {
+				if (board[row][col].equals(" -")) {
+					board[row][col] = player;
+					currentValue = minValue(depth-1);
+					if (currentValue > bestValue) bestValue = currentValue;
+					board[row][col] = " -";
+				}
+			}
+		}
+		return bestValue;
 	}
-	
-	public static boolean terminalTest() {
+		
+	public static boolean isBoardEmpty() {
+		for (int row = 1; row < board.length; row++) {
+			for (int col = 1; col < board.length; col++) {
+				if (!board[row][col].equals(" -")) return false;
+			}
+		}
 		return true;
 	}
 	
-	public static int utility() {
-		return 0;
+	public static boolean isGameOver() {
+		if (isWinner() != 0) return true;
+		return false;
 	}
 	
-	public static boolean isWinner(String player, String move) {
-		int row = move.charAt(0) - 'a' + 1;
-		int col = Integer.parseInt(String.valueOf(move.charAt(1)));
+	public static int isWinner() {
 		int count = 0;
+		String opponent = " O", computer = " X";
+		
+		for (int row = 1; row < board.length; row++) {
+			for (int col = 1; col < board.length; col++) {
+				if (board[row][col].equals(computer)) count++;
+				else count = 0;
+				
+				if (count == 4) return 1;
+			}
+		}
+		
+		for (int col = 1; col < board.length; col++) {
+			for (int row = 1; row < board.length; row++) {
+				if (board[row][col].equals(computer)) count++;
+				else count = 0;
+				
+				if (count == 4) return 1;
+			}
+		}
 
-		for (int i = 1; i < DIMENSION; i++) {
-			if (board[row][i].equals(player)) count++;
-			else count = 0;
-			
-			if (count == 4) return true;
+		for (int row = 1; row < board.length; row++) {
+			for (int col = 1; col < board.length; col++) {
+				if (board[row][col].equals(opponent)) count++;
+				else count = 0;
+				
+				if (count == 4) return -1;
+			}
 		}
-		for (int i = 1; i < DIMENSION; i++) {
-			if (board[i][col].equals(player)) count++;
-			else count = 0;
-			
-			if (count == 4) return true;
+		
+		for (int col = 1; col < board.length; col++) {
+			for (int row = 1; row < board.length; row++) {
+				if (board[row][col].equals(opponent)) count++;
+				else count = 0;
+				
+				if (count == 4) return -1;
+			}
 		}
-		return false;
+		
+		return 0;
 	}
 	
 	public static void markOponentMoveOnBoard(String move) {
@@ -125,12 +213,11 @@ public class AdverserialSearch {
 		addToBoardForPerson(letter, number);
 	}
 	
-	public static String markRandMoveOnBoard() {
-		int low = 97, high = 104;
+	public static void markRandMoveOnBoard() {
+		int low = 97, high = 100;
 		String letter = String.valueOf((char) (new Random().nextInt(high-low+1) + low)), 
-			   number = String.valueOf(new Random().nextInt(7)+1);
+			   number = String.valueOf(new Random().nextInt(3)+1);
 		addToBoardForComp(letter, number);
-		return letter+number;
 	}
 	
 	public static void addToBoardForComp(String letter, String number) {
@@ -147,50 +234,6 @@ public class AdverserialSearch {
 		board[i1][i2] = board[i1][i2].replace("-", "O");
 		System.out.println();
 		printBoard(board);
-	}
-}
-
-class Node {
-	String player;
-	private int value;
-	String [][] newCurrentBoard = new String[5][5];
-	Queue<Node> successorStates = new PriorityQueue<>();
-	
-	Node(){}
-	
-	Node (String[][] currentBoard) {
-		System.arraycopy(currentBoard, 0, newCurrentBoard, 0, currentBoard.length);
-	}
-	
-	Node (String[][] currentBoard, String player) {
-		System.arraycopy(currentBoard, 0, newCurrentBoard, 0, currentBoard.length);
-		this.player = player;
-	}
-	
-	public void setBoard(String[][] newCurrentBoard) {
-		System.arraycopy(newCurrentBoard, 0, this.newCurrentBoard, 0, newCurrentBoard.length);
-	}
-	
-	public void setValue(int value) {this.value = value;}
-	
-	public void setPlayer(String player) {this.player = player;}
-	
-	public String[][] getBoard() {return newCurrentBoard;}
-	
-	public int getValue() {return value;}
-	
-	public String getPlayer() {return player;}
-	
-	public void printMove() {
-		//print move by using array indeces that position "X"
-	}
-}
-
-class SuccessorComparator implements Comparator<Node> {
-	public int compare (Node firstSuccessor, Node secondSuccessor) {
-		if (firstSuccessor.getValue() > secondSuccessor.getValue()) return -1;
-		else if (secondSuccessor.getValue() > firstSuccessor.getValue()) return 1;
-		return 0;
 	}
 }
 
