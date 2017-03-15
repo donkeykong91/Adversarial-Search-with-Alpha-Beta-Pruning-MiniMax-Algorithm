@@ -44,7 +44,7 @@ public class AdverserialSearch {
 			    		    		break;
 			    		    	}
 			    		    	startTime = System.currentTimeMillis();
-			    		    	endTime = startTime * 60 * 1000;
+			    		    	endTime = startTime + 60 * 1000;
 			    		    	miniMaxAlgorithm();
 			    		    	if (computerWins()) {
 			    		    		System.out.println("\nComputer wins");
@@ -60,7 +60,7 @@ public class AdverserialSearch {
 		    				while (true) {
 		    					System.out.println();
 			    		    	startTime = System.currentTimeMillis();
-			    		    	endTime = startTime * 60 * 1000;
+			    		    	endTime = startTime + 60 * 1000;
    			    		    	miniMaxAlgorithm();
 			    		    	if (computerWins()) {
 			    		    		System.out.println("\nComputer wins");
@@ -108,7 +108,9 @@ public class AdverserialSearch {
 						}
 						board[row][col] = " -";
 					}
+					if (System.currentTimeMillis() >= endTime) break;
 				}
+				if (System.currentTimeMillis() >= endTime) break;
 			}
 			System.out.println("\nMy current move is: " + board[newRow][0].toLowerCase() + newCol);
 			board[newRow][newCol] = player;
@@ -118,14 +120,14 @@ public class AdverserialSearch {
 	public static int minValue(int depth, int alpha, int beta) {
 		int currentValue = 0;
 		String player = " O";
-		if (--depthCutOff == 0 || System.currentTimeMillis() >= endTime) return isOpponentWinner();
+		if (--depthCutOff == 0 || System.currentTimeMillis() < endTime) return isOpponentWinner();
 		if (depth == 0) return 0;
 			
 		for (int row = 1; row < board.length; row++) {
 			for (int col = 1; col < board.length; col++) {
 				if (board[row][col].equals(" -")) {
 					board[row][col] = player;
-					if (--depthCutOff == 0 || System.currentTimeMillis() >= endTime) return isOpponentWinner();
+					if (--depthCutOff == 0 || System.currentTimeMillis() < endTime) return isOpponentWinner();
 					currentValue = maxValue(depth-1, alpha, beta);
 					if (currentValue < beta) beta = currentValue;
 					board[row][col] = " -";
@@ -139,14 +141,14 @@ public class AdverserialSearch {
 	public static int maxValue(int depth, int alpha, int beta) {
 		int currentValue = 0;
 		String player = " X";
-		if (--depthCutOff == 0 || System.currentTimeMillis() >= endTime) return isComputerWinner();
+		if (--depthCutOff == 0 || System.currentTimeMillis() < endTime) return isComputerWinner();
 		if (depth == 0) return 0;
 			
 		for (int row = 1; row < board.length; row++) {
 			for (int col = 1; col < board.length; col++) {
 				if (board[row][col].equals(" -")) {
 					board[row][col] = player;
-					if (--depthCutOff == 0 || System.currentTimeMillis() >= endTime) return isComputerWinner();
+					if (--depthCutOff == 0 || System.currentTimeMillis() < endTime) return isComputerWinner();
 					currentValue = minValue(depth-1, alpha, beta);
 					if (currentValue > alpha) alpha = currentValue;
 					board[row][col] = " -";
